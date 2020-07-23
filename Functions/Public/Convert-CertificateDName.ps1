@@ -43,6 +43,7 @@
 #>
 function Convert-CertificateDName {
     [CmdletBinding()]
+    [OutputType('System.Collections.Hashtable')]
     param (
         [Parameter(
             Mandatory = $true,
@@ -115,7 +116,7 @@ function Convert-CertificateDName {
         [System.String]$certPropName = "$($Field)Name"
         [System.Security.Cryptography.X509Certificates.X500DistinguishedName]$certDName = $Certificate.$certPropName
     }
-    
+
     Write-Verbose -Message "$myName $Field found: $($certDName.Name)"
     [System.String]$certDNameFormatted = $certDName.Format($true)
     [System.Char[]]$charsToExclude = $certDNameFormatted.ToCharArray().Where({
@@ -126,7 +127,7 @@ function Convert-CertificateDName {
         -not [System.String]::IsNullOrEmpty($_)
     })
     Write-Verbose -Message "$myName The $Field is formatted. Found $($certDNameSplitted.Count) attributes total. Converting into hashtable..."
-    
+
     [System.Collections.Hashtable]$certSubjectTable = @{}
     $certDNameSplitted.ForEach({
         [System.String[]]$attribSplitted = $_.Split('=')
@@ -199,7 +200,7 @@ function Convert-CertificateDName {
             $certSubjectTable.Remove($_)
         })
     }
-    
+
     Write-Verbose -Message "$myName Returning the parsed Distinguished Name without empty attributes. End of the function"
     return $certSubjectTable
 }
