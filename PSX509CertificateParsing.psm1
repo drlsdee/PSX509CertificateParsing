@@ -125,11 +125,12 @@ function Get-AllAliases {
         [string[]]
         $Functions
     )
-    [System.Management.Automation.AliasInfo[]]$aliasesList = @()
+    #[System.Management.Automation.AliasInfo[]]$aliasesList = @()
+    [string[]]$aliasesList = @()
     $Functions.ForEach({
         [string]$functionCurrent = $_
         try {
-            $aliasInfo = Get-Alias -Definition $functionCurrent -ErrorAction Stop
+            $aliasInfo = (Get-Alias -Definition $functionCurrent -ErrorAction Stop).Name
             $aliasesList += $aliasInfo
         }
         catch {

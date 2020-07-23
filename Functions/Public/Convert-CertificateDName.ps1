@@ -44,6 +44,7 @@
 function Convert-CertificateDName {
     [CmdletBinding()]
     [OutputType('System.Collections.Hashtable')]
+    [Alias('Convert-CertificateSubject')]
     param (
         [Parameter(
             Mandatory = $true,
