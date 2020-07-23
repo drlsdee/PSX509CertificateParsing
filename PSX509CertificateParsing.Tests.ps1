@@ -22,14 +22,16 @@ $psTestData                     =   Import-PowerShellDataFile -Path $psTestDataP
 })
 
 ##  The expected directory structure:
-[string[]]$psDirsShouldPresent  =   $psTestData.psDirsShouldPresent
+[string[]]$psDirsShouldPresent  =   $psTestData.psDirsShouldPresent.ForEach({
+    [System.IO.Path]::Combine($PSScriptRoot, $_)
+})
 
 Describe "General tests for the module: $psModuleName" {
     Context "Inventory: $psModuleName" {
         [hashtable[]]$psTestCasesFolders    =   @()
         $psDirsShouldPresent.ForEach({
             $psTestCasesFolders +=  @{
-                FolderPath      =   [System.IO.Path]::Combine($PSScriptRoot, $_)
+                FolderPath      =   $_
             }
         })
 
@@ -37,7 +39,6 @@ Describe "General tests for the module: $psModuleName" {
             param(
                 $FolderPath
             )
-            #Write-Verbose -Message "Expecting the folder exists: $folderPath"
             [bool]$folderExists =   [System.IO.Directory]::Exists($folderPath)
             $folderExists       |   Should -BeTrue
         }
