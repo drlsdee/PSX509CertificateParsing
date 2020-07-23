@@ -72,15 +72,39 @@ function List-FunctionsAll {
     [string]$functionsPrivatePath = [System.IO.Path]::Combine($functionsPath, $FunctionsPrivate)
     Write-Verbose -Message "Public functions should be here: $functionsPublicPath"
     Write-Verbose -Message "Private functions should be here: $functionsPrivatePath"
-    [string[]]$functionPublicFiles      = $Extensions.ForEach({
-        Enumerate-FilesByExtension -Path $functionsPublicPath -Pattern $_
-    }) | Select-Object -Unique # For case when the same extension is defined in several forms.
-    Write-Verbose -Message "Found $($functionPublicFiles.Count) public functions"
-    [string[]]$functionsPrivateFiles    = $Extensions.ForEach({
-        Enumerate-FilesByExtension -Path $functionsPrivatePath -Pattern $_
-    }) | Select-Object -Unique # For case when the same extension is defined in several forms.
-    Write-Verbose -Message "Found $($functionsPrivateFiles.Count) private functions"
-    
+
+    if
+    (
+        [System.IO.Directory]::Exists($functionsPublicPath) -and `
+        [System.IO.Directory]::Exists($functionsPrivatePath)
+    )
+    {
+        [string[]]$functionPublicFiles      = $Extensions.ForEach({
+            Enumerate-FilesByExtension -Path $functionsPublicPath -Pattern $_
+        }) | Select-Object -Unique # For case when the same extension is defined in several forms.
+        Write-Verbose -Message "Found $($functionPublicFiles.Count) public functions"
+        [string[]]$functionsPrivateFiles    = $Extensions.ForEach({
+            Enumerate-FilesByExtension -Path $functionsPrivatePath -Pattern $_
+        }) | Select-Object -Unique # For case when the same extension is defined in several forms.
+        Write-Verbose -Message "Found $($functionsPrivateFiles.Count) private functions"    
+    }
+    elseif
+    (
+        [System.IO.Directory]::Exists($functionsPath)
+    )
+    {
+        Write-Warning -Message "The root module folder `"$PSScriptRoot`" does not contain any subfolders where public and / or private functions are expected, but it does contain the subfolder `"$Functions`". Thus, all functions in that subfolder will be exported as public."
+        [string[]]$functionPublicFiles      = $Extensions.ForEach({
+            Enumerate-FilesByExtension -Path $functionsPath -Pattern $_
+        }) | Select-Object -Unique # For case when the same extension is defined in several forms.
+        [string[]]$functionsPrivateFiles    = @()
+    }
+    else {
+        Write-Warning -Message "The root module folder `"$PSScriptRoot`" does not contain any subfolders where public and / or private functions are expected!"
+        [string[]]$functionsPrivateFiles    = @()
+        [string[]]$functionsPrivateFiles    = @()
+    }
+
     [string[]]$functionsToExport = $functionPublicFiles.ForEach({
         [System.IO.Path]::GetFileNameWithoutExtension($_)
     })
