@@ -7,8 +7,8 @@
     )
 
     psDirsShouldPresent =   @(
-        'Functions'
-        'Functions\Private'
+        #'Functions'
+        #'Functions\Private'
         'Functions\Public'
     )
 
